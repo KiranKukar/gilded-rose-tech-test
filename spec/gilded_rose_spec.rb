@@ -15,6 +15,12 @@ describe GildedRose do
       expect { @gilded_rose.update_quality }.to change(item_no_sell_in, :quality).by(-2)
     end
 
+    it "aged brie,backstage passes and undefined items, all decrease sell_in by one " do
+      expect { @gilded_rose.update_quality }.to change(item_aged_brie, :sell_in).by(-1)
+      expect { @gilded_rose.update_quality }.to change(item_backstage_pass, :sell_in).by(-1)
+      expect { @gilded_rose.update_quality }.to change(item_no_sell_in, :sell_in).by(-1)
+    end
+
     it "The Quality of an item is never negative" do
       6.times { @gilded_rose.update_quality }
       expect(item_no_sell_in.quality).to eq 0
