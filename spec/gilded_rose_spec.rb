@@ -6,19 +6,21 @@ describe GildedRose do
     let(:item_sulfuras) { Item.new("Sulfuras, Hand of Ragnaros",0,30) }
     let(:item_backstage_pass) { Item.new("Backstage passes to a TAFKAL80ETC concert",40,2) }
     let(:item_no_sell_in) { Item.new("Blue Herb",0,10) }
+    let(:item_conjured) { Item.new("Conjured", 10, 40) }
 
     before(:each) do
-      @gilded_rose = GildedRose.new([item_aged_brie, item_sulfuras, item_backstage_pass, item_no_sell_in])
+      @gilded_rose = GildedRose.new([item_aged_brie, item_sulfuras, item_backstage_pass, item_no_sell_in, item_conjured])
     end
 
     it "Once the sell by date has passed, Quality degrades twice as fast" do
       expect { @gilded_rose.update_quality }.to change(item_no_sell_in, :quality).by(-2)
     end
 
-    it "aged brie,backstage passes and undefined items, all decrease sell_in by one " do
+    it "aged brie,backstage passes, conjured and undefined items, all decrease sell_in by one " do
       expect { @gilded_rose.update_quality }.to change(item_aged_brie, :sell_in).by(-1)
       expect { @gilded_rose.update_quality }.to change(item_backstage_pass, :sell_in).by(-1)
       expect { @gilded_rose.update_quality }.to change(item_no_sell_in, :sell_in).by(-1)
+      expect { @gilded_rose.update_quality }.to change(item_conjured, :sell_in).by(-1)
     end
 
     it "The Quality of an item is never negative" do
@@ -59,7 +61,19 @@ describe GildedRose do
       expect(item_backstage_pass.quality).to eq 0
     end
 
-# “Conjured” items degrade in Quality twice as fast as normal items
+    it "conjured items degrade in Quality twice as fast as normal items" do
+      expect { @gilded_rose.update_quality }.to change(item_conjured, :quality).by(-2)
+    end
+
+    it "conjured items after sell by date has passed, Quality degrades twice as fast" do
+      10.times { @gilded_rose.update_quality }
+      expect { @gilded_rose.update_quality }.to change(item_conjured, :quality).by(-4)
+    end
+
+    it "conjured items the Quality of them is never negative" do
+      16.times { @gilded_rose.update_quality }
+      expect(item_conjured.quality).to eq 0
+    end
 
   end
 end
